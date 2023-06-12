@@ -25,10 +25,13 @@ file.write("SUCESS")
 while True:
     # Start reading Serial Port
     buffer = sr.serial_connection(port=config.PORT_EPS,bauldrate=config.BAUDRATE,parity=config.PARITY,stopbit=config.STOP_BIT)
+    if buffer == "_":
+        print("Nothing received through the connection")
+        continue
     # Match each case for logging
     (code,message) = log.log_handler(buffer)
     # Base case, didn't matched any case
-    if code == "Ok":
+    if code == log.CODE_TYPE.OK:
         continue
     # Matched a reading
     else:
@@ -49,6 +52,7 @@ while True:
             except:
                 # TODO: Fix the generic exception 
                 print("Error either on closing the file or creating a new one")
+        # TODO Match of possible codes
         
         # TODO Write the log contents to the file
         #file.write(processed_buffer)

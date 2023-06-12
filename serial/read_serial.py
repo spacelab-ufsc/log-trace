@@ -9,3 +9,14 @@ def serial_connection(port,bauldrate,stopbit,parity):
     except:
         # TODO Look for especific exceptions
         print("Couldn't connect with serial port")
+        return "_"
+
+
+if __name__ == "__main__":
+    while True:
+        buffer = serial_connection(port='',bauldrate=9600,stopbit=1,parity=0)
+        print(buffer)
+        if buffer.__contains__("\033"):
+            print("Found escape character for ANSI patern")
+        if buffer.__contains__( "\033[31;1;"):
+            print("Found Error Code: {}".format(buffer))
