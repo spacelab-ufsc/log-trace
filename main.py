@@ -24,7 +24,7 @@ file.write("SUCESS")
 
 while True:
     # Start reading Serial Port
-    buffer = sr.serial_connection(port=config.PORT_EPS,bauldrate=config.BAUDRATE,parity=config.PARITY,stopbit=config.STOP_BIT)
+    buffer = sr.serial_connection(port=config.PORT_EPS,bauldrate=config.BAUDRATE)
     if buffer == "_":
         print("Nothing received through the connection")
         continue
