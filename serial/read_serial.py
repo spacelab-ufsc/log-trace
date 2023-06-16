@@ -17,6 +17,6 @@ if __name__ == "__main__":
         buffer = serial_connection(port='',bauldrate=115200)
         print(buffer)
         if buffer.__contains__("\033"):
-            print("Found escape character for ANSI patern")
+            print("Found escape character for ANSI pattern")
         if buffer.__contains__( "\033[31;1;"):
             print("Found Error Code: {}".format(buffer))

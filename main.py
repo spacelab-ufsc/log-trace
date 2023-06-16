@@ -5,55 +5,46 @@ import config
 import log_handlers.log_handler as log
 import serial.read_serial as sr
 
-# Reference day as an int, needed for generating files
-ref_day = int(time.strftime("%d")) 
-# Reference date, needed for generating files
-ref_date = time.strftime("[%d/%m/%Y]")
-# Initial File for log storage
-# TODO Choose the file dynamics
-#try:
-    #path = ("{}/log-{}.txt".format(config.PATH_FOR_LOGS,ref_date))
-    #file = open(path,"a+")
-#except FileNotFoundError:
-     # TODO: Fix the generic exception 
-#    print("Error: FileNotFoundError -> Probably a something wrong with the path")
-
-# TEST
-file = open("a.txt","a+")
-file.write("SUCESS")
 
 while True:
-    # Start reading Serial Port
-    buffer = sr.serial_connection(port=config.PORT_EPS,bauldrate=config.BAUDRATE)
-    if buffer == "_":
-        print("Nothing received through the connection")
-        continue
-    # Match each case for logging
-    (code,message) = log.log_handler(buffer)
-    # Base case, didn't matched any case
-    if code == log.CODE_TYPE.OK:
-        continue
-    # Matched a reading
-    else:
-        # Current time 
-        date = time.strftime("[%d/%m/%Y] - %H:%M:%S")
+    # Start reading Serial Port for all modules
+    buffer_ttic = sr.serial_connection(port=config.PORT_TTIC,bauldrate=config.BAUDRATE)
+    buffer_obdh = sr.serial_connection(port=config.PORT_OBDH,bauldrate=config.BAUDRATE)
+    buffer_eps = sr.serial_connection(port=config.PORT_EPS,bauldrate=config.BAUDRATE)
+    
+    # Creating an iterable container to simplify going through all data
+    buffers = [buffer_eps,buffer_ttic,buffer_obdh]
 
-        # Current day as an int
-        current_day = int(time.strftime("%d")) 
-
-        # Checks if the day changed and creates a new file if it has changed
-        if ref_day != current_day:
-            ref_day = current_day
-            ref_date = time.strftime("[%d/%m/%Y]")
+    for buffer in buffers:
+        # Check for critical messages 
+        code = log.log_handler(buffer)
+        # Match for the type of the critical messages
+        if code == log.CODE_TYPE.OK:
+            continue
+        elif code == log.CODE_TYPE.ERROR:
+            log_date = time.strftime("[%d/%m/%Y] - %H:%M:%S")
+            file_date = time.strftime("[%d/%m/%Y]")
             try:
-                file.close()
-                path = ("{}/log-{}.txt".format(config.PATH_FOR_LOGS,ref_date))
-                file = open(path,"a+")
+                path = ("{}/log-{}.txt".format(config.PATH_FOR_LOGS,file_date))
+                log_file = open(path,"a+")
+                log_file.write("{} - CODE::ERROR -> {}".format(log_date,buffer))
+                print("{} - CODE::ERROR -> {}".format(log_date,buffer))
+                log_file.close()
             except:
                 # TODO: Fix the generic exception 
                 print("Error either on closing the file or creating a new one")
-        # TODO Match of possible codes
-        
-        # TODO Write the log contents to the file
-        #file.write(processed_buffer)
-
+            # TODO Match of possible codes
+        elif code == log.CODE_TYPE.RESET:
+            log_date = time.strftime("[%d/%m/%Y] - %H:%M:%S")
+            file_date = time.strftime("[%d/%m/%Y]")
+            try:
+                path = ("{}/log-{}.txt".format(config.PATH_FOR_LOGS,file_date))
+                log_file = open(path,"a+")
+                log_file.write("{} - CODE::RESET -> {}".format(log_date,buffer))
+                print("{} - CODE::RESET -> {}".format(log_date,buffer))
+                log_file.close()
+            except:
+                # TODO: Fix the generic exception 
+                print("Error either on closing the file or creating a new one")
+            # TODO Match of possible codes
+            
