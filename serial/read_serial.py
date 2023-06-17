@@ -9,7 +9,7 @@ def serial_connection(port,bauldrate):
     except:
         # TODO Look for especific exceptions
         print("Couldn't connect with serial port")
-        return "_"
+        return "_E_"
 
 
 # Test to check validation of approach

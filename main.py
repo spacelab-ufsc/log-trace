@@ -31,9 +31,10 @@ while True:
                 log_file.write("{} - CODE::ERROR -> {}".format(log_date,buffer))
                 print("{} - CODE::ERROR -> {}".format(log_date,buffer))
                 log_file.close()
-            except:
-                # TODO: Fix the generic exception 
+            except (FileNotFoundError, PermissionError):
                 print("Error either on closing the file or creating a new one")
+            except (OSError, IOError):
+                print("Error on writing to the file")
         elif code == log.CODE_TYPE.RESET:
             log_date = time.strftime("[%d/%m/%Y] - %H:%M:%S")
             file_date = time.strftime("[%d/%m/%Y]")
@@ -43,7 +44,8 @@ while True:
                 log_file.write("{} - CODE::RESET -> {}".format(log_date,buffer))
                 print("{} - CODE::RESET -> {}".format(log_date,buffer))
                 log_file.close()
-            except:
-                # TODO: Fix the generic exception 
+            except (FileNotFoundError, PermissionError):
                 print("Error either on closing the file or creating a new one")
+            except (OSError, IOError):
+                print("Error on writing to the file")
             

@@ -15,7 +15,7 @@ class CODE_CONDITION(Enum):
     RESET_1 = "Last reset cause: " 
 
 # Simply checks if the conditions are on stream buffer
-def log_handler(str_stream):
+def log_handler(str_stream: str):
     if str_stream.__contains__(CODE_CONDITION.ERROR.value):
         return CODE_TYPE.ERROR
     elif str_stream.__contains__(CODE_CONDITION.RESET_1.value):
