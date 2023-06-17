@@ -12,6 +12,7 @@ def serial_connection(port,bauldrate):
         return "_"
 
 
+# Test to check validation of approuch
 if __name__ == "__main__":
     while True:
         buffer = serial_connection(port='',bauldrate=115200)

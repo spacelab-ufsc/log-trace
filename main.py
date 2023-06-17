@@ -1,14 +1,14 @@
 # SCRIPT TO RUN
 
-import time 
-import config
-import log_handlers.log_handler as log
-import serial.read_serial as sr
+import time # Basically used to get local time
+import config # Import configuration
+import log_handlers.log_handler as log # Contains logic to detect important logs
+import serial.read_serial as sr # Contains the logic to read from serial port
 
 
 while True:
     # Start reading Serial Port for all modules
-    buffer_ttic = sr.serial_connection(port=config.PORT_TTIC,bauldrate=config.BAUDRATE)
+    buffer_ttic = sr.serial_connection(port=config.PORT_TTC,bauldrate=config.BAUDRATE)
     buffer_obdh = sr.serial_connection(port=config.PORT_OBDH,bauldrate=config.BAUDRATE)
     buffer_eps = sr.serial_connection(port=config.PORT_EPS,bauldrate=config.BAUDRATE)
     
@@ -19,6 +19,7 @@ while True:
         # Check for critical messages 
         code = log.log_handler(buffer)
         # Match for the type of the critical messages
+        # TODO Match of possible codes
         if code == log.CODE_TYPE.OK:
             continue
         elif code == log.CODE_TYPE.ERROR:
@@ -33,7 +34,6 @@ while True:
             except:
                 # TODO: Fix the generic exception 
                 print("Error either on closing the file or creating a new one")
-            # TODO Match of possible codes
         elif code == log.CODE_TYPE.RESET:
             log_date = time.strftime("[%d/%m/%Y] - %H:%M:%S")
             file_date = time.strftime("[%d/%m/%Y]")
@@ -46,5 +46,4 @@ while True:
             except:
                 # TODO: Fix the generic exception 
                 print("Error either on closing the file or creating a new one")
-            # TODO Match of possible codes
             

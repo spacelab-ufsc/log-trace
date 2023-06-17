@@ -1,20 +1,37 @@
 # Contains the handling of different log messages -> Ex: Error messages, Restart messages , etc
-# TODO Choose all conditions to look for
 
 from enum import Enum
 
+# All possible CODE STATUS
 class CODE_TYPE(Enum):
     OK = "OK"
     ERROR = "ERROR"
     RESET = "RESET"
 
+# TODO Check if theres more conditions to look for
+# Encapsulates all conditions that are sought-after
+class CODE_CONDITION(Enum):
+    ERROR = "\033[1;31m"
+    RESET_1 = "Last reset cause: " 
+
+# Simply checks if the conditions are on stream buffer
 def log_handler(str_stream):
-    ERROR_LOG_CONDITION = "\033[31;1;"
-    # TODO RESET_LOG_CONDITION = "_" 
-    if str_stream.__contains__(ERROR_LOG_CONDITION):
+    if str_stream.__contains__(CODE_CONDITION.ERROR.value):
         return CODE_TYPE.ERROR
-    # TODO elif str_stream.__contains__(RESET_LOG_CONDITION):
-        return ("RESET",str_stream)
+    elif str_stream.__contains__(CODE_CONDITION.RESET_1.value):
+        return CODE_TYPE.RESET
     else:
         return CODE_TYPE.OK
+
+
+
+
+
+
+
+
+
+
+
+
 
