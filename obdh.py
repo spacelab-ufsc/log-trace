@@ -5,10 +5,7 @@ import config.config as cfg
 import log_handlers.log_handler as log # Contains logic to detect important logs
 import serial.read_serial as sr # Contains the logic to read from serial port
 
-print("Please select which module to log")
-module:str = input("Options are -> [OBDH,EPS,TTC] > ").upper().strip()
-
-config:dict = cfg.load_config(module)
+config:dict = cfg.load_config("OBDH")
 
 while True:
     # Start reading Serial Port for all modules

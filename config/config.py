@@ -8,6 +8,3 @@ def load_config(module:str) -> dict:
     path_srport = config["modules"][module]["path_sr_port"]
     return {"baudrate": baudrate, "path_srport": path_srport, "path_file": path_file}
 
-if __name__ == "__main__":
-    config = load_config("EPS")
-    print(config["baudrate"])
