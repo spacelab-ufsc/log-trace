@@ -26,7 +26,7 @@ while True:
         log_date = time.strftime("[%d/%m/%Y] - %H:%M:%S")
         file_date = time.strftime("[%d/%m/%Y]")
         try:
-            path = ("{}/log-{}.txt".format(config["path_file"],file_date))
+            path = ("{}/{}-{}.txt".format(config["path_file"],module,file_date))
             log_file = open(path,"a+")
             log_file.write("{} - CODE::ERROR -> {}".format(log_date,buffer))
             print("{} - CODE::ERROR -> {}".format(log_date,buffer))
@@ -39,7 +39,7 @@ while True:
         log_date = time.strftime("[%d/%m/%Y] - %H:%M:%S")
         file_date = time.strftime("[%d/%m/%Y]")
         try:
-            path = ("{}/log-{}.txt".format(config["path_file"],file_date))
+            path = ("{}/{}-{}.txt".format(config["path_file"],module,file_date))
             log_file = open(path,"a+")
             log_file.write("{} - CODE::RESET -> {}".format(log_date,buffer))
             print("{} - CODE::RESET -> {}".format(log_date,buffer))
