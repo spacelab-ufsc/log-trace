@@ -1,9 +1,9 @@
 # Reads Serial
 import serial
 
-def serial_connection(port,bauldrate):
+def serial_connection(port,baudrate):
     try:
-        stream = serial.Serial(port=port,baudrate=bauldrate)
+        stream = serial.Serial(port=port,baudrate=baudrate)
         b_buffer = stream.readline()
         return b_buffer.decode("ascii")
     except:
@@ -16,7 +16,7 @@ def serial_connection(port,bauldrate):
 if __name__ == "__main__":
     while True:
         # Don't forget to change the port path
-        buffer = serial_connection(port='',bauldrate=115200)
+        buffer = serial_connection(port='',baudrate=115200)
         print(buffer)
         if buffer.__contains__("\033"):
             print("Found escape character for ANSI pattern")
