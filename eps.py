@@ -27,7 +27,7 @@ while True:
             path = ("{}/{}-{}.txt".format(config["path_file"],module,file_date))
             log_file = open(path,"a+")
             log_file.write("{} - CODE::ERROR -> {}".format(log_date,buffer))
-            print("{} - CODE::ERROR -> {}".format(log_date,buffer))
+            print("{} on {} - CODE::ERROR -> {}".format(log_date,module,buffer))
             log_file.close()
         except (FileNotFoundError, PermissionError):
             print("Error either on closing the file or creating a new one")
@@ -40,7 +40,7 @@ while True:
             path = ("{}/{}-{}.txt".format(config["path_file"],module,file_date))
             log_file = open(path,"a+")
             log_file.write("{} - CODE::RESET -> {}".format(log_date,buffer))
-            print("{} - CODE::RESET -> {}".format(log_date,buffer))
+            print("{} on {} - CODE::RESET -> {}".format(log_date,module,buffer))
             log_file.close()
         except (FileNotFoundError, PermissionError):
             print("Error either on closing the file or creating a new one")
