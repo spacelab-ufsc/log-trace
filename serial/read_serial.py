@@ -1,13 +1,13 @@
 # Reads Serial
 import serial
 
-def serial_connection(port,baudrate):
+
+def serial_connection(port, baudrate):
     try:
-        stream = serial.Serial(port=port,baudrate=baudrate)
+        stream = serial.Serial(port=port, baudrate=baudrate)
         b_buffer = stream.readline()
         return b_buffer.decode("ascii")
     except:
-        # TODO Look for especific exceptions
         print("Couldn't connect with serial port")
         return "_E_"
 
@@ -16,11 +16,13 @@ def serial_connection(port,baudrate):
 if __name__ == "__main__":
     while True:
         # Don't forget to change the port path
-        buffer = serial_connection(port='',baudrate=115200)
+        buffer = serial_connection(port="", baudrate=115200)
         print(buffer)
-        if buffer.__contains__("\033"):
+        if "\033" in buffer:
             print("Found escape character for ANSI pattern")
-        if buffer.__contains__("\033[1;31m"):
+        if "\033[1;31m" in buffer:
             print("Found Error Code: {}".format(buffer))
-        if buffer.__contains__("Last reset cause:"):
+        if "Last reset cause:" in buffer:
             print("Found Reset condition")
+        else:
+            print("Found nothing")
