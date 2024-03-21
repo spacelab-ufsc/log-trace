@@ -19,7 +19,7 @@ def setup_logging(module: str, log_dir: str):
 
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-        print(f"Creating log directory on: {log_dir}")
+        print(f"Creating log directory on: ./{log_dir}")
 
     if not os.path.exists(filename):
         with open(filename, "w") as f:
@@ -49,7 +49,7 @@ def serial_connection(port, baudrate):
 
 def serial_read(stream) -> str:
     b_buffer = stream.readline()
-    return b_buffer.decode("ascii")
+    return b_buffer.decode()
 
 
 def log_trace_cli():
