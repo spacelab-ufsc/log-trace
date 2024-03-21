@@ -82,12 +82,12 @@ def log_trace_cli():
 
     setup_logging(args.log_file, args.log_dir)
 
-    dev = serial_connection(args.port, BAUD)
+    dev = serial_connection(args.PORT, BAUD)
 
     try:
         while True:
             log_line = serial_read(dev)
-            print(log_line)
+            print(log_line, end="")
             save_logs(log_line)
 
     except KeyboardInterrupt:
