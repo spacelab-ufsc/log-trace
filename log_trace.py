@@ -47,9 +47,9 @@ def serial_connection(port, baudrate):
     return stream
 
 
-def serial_read(stream) -> str:
+def serial_read(stream: serial.Serial) -> str:
     b_buffer = stream.readline()
-    return b_buffer.decode("ascii")
+    return b_buffer.decode("iso-8859-1", "ignore")
 
 
 def log_trace_cli():
