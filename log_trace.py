@@ -17,7 +17,7 @@ def setup_logging(module: str, log_dir: str):
 
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-        print(f"Creating log directory on: {log_dir}")
+        print(f"Creating log directory on: ./{log_dir}")
 
     if not os.path.exists(filename):
         with open(filename, "w") as f:
