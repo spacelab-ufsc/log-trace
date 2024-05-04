@@ -8,11 +8,9 @@ ERROR_CODE = "\033[1;31m"
 BAUD = 115200
 LOG_DIR = "logs"
 
-
 def remove_ansi_color(string: str) -> str:
     ansi_escape = re.compile(r"\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
     return ansi_escape.sub("", string)
-
 
 def setup_logging(module: str, log_dir: str):
     filename = "./" + log_dir + "/" + module + ".log"
@@ -32,7 +30,6 @@ def setup_logging(module: str, log_dir: str):
         format="[%(asctime)s][%(levelname)s] > %(message)s",
     )
 
-
 def save_logs(line: str):
     logline = remove_ansi_color(line)
 
@@ -41,16 +38,13 @@ def save_logs(line: str):
     else:
         logging.info(logline)
 
-
 def serial_connection(port, baudrate):
     stream = serial.Serial(port=port, baudrate=baudrate)
     return stream
 
-
 def serial_read(stream: serial.Serial) -> str:
     b_buffer = stream.readline()
     return b_buffer.decode("iso-8859-1", "ignore")
-
 
 def log_trace_cli():
     cli_parser = argparse.ArgumentParser(
@@ -95,7 +89,6 @@ def log_trace_cli():
 
     finally:
         dev.close()
-
 
 if __name__ == "__main__":
     log_trace_cli()
