@@ -31,6 +31,7 @@ _ICON_FILE_LOCAL                = os.path.abspath(os.path.dirname(__name__)) + '
 _LOGO_FILE_LOCAL                = os.path.abspath(os.path.dirname(__name__)) + '/data/img/spacelab-logo-full-400x200.png'
 
 _DIR_CONFIG_LINUX               = '.spacelab-Serial_COM'
+
 class Serial_COM:
     def __init__(self):
         self.builder = Gtk.Builder()
@@ -49,11 +50,11 @@ class Serial_COM:
             "Data_bits" : [serial.FIVEBITS , serial.SIXBITS , serial.SEVENBITS , serial.EIGHTBITS]
         }
 
+        self.Serial_Port = self.Serial_config["Serial_Port"][0]
+
         self.builder.connect_signals(self)
         self._build_widgets()
         self._load_preferences()
-
-        self.Serial_Port = None
 
         self.run()
 
@@ -69,7 +70,7 @@ class Serial_COM:
         self.window.set_title("CubeSAT_COM")
 
         self.window.set_wmclass(self.window.get_title(), self.window.get_title())
-        self.window.connect("destroy", Gtk.main_quit)
+        self.window.connect("destroy", self.onDestroy)
 
         # Action Buttons
         self.button_connect = self.builder.get_object("button_connect")
@@ -86,14 +87,16 @@ class Serial_COM:
 
         # Serial Commands
         self.Command = self.builder.get_object("Command")
-        self.Command.connect("key-press-event", self.on_Command_key_press)
+        self.Command.connect("activate", self.on_Command_activate)
 
         self.Button_Send = self.builder.get_object("Button_Send")
         self.Button_Send.connect("clicked", self.on_Button_Send_clicked)
 
         self.Recieved_Text = self.builder.get_object("Received_Text")
+        self.received_scroll = self.builder.get_object("received_scroll")
 
         self.Text_Commands = self.builder.get_object("Text_Commands")
+        self.Commands_scroll = self.builder.get_object("Commands_scroll")
 
         # Serial Port Settings
         self.Serial_Port_Box1 = self.builder.get_object("Serial_Port1")
@@ -109,7 +112,8 @@ class Serial_COM:
         self.Module = self.builder.get_object("Module")
         self.Log_Record = self.builder.get_object("Record_Switch")
 
-        self.Log_Dir.set_current_folder(LOG_DIR)
+        self.Log_Dir.set_current_folder(_CURRENT_DIR_LOCAL + LOG_DIR)
+        #self.Log_Dir.set_current_name(LOG_DIR)
 
         # Settings Window
         self.COMSettings = self.builder.get_object("COMSettings")
@@ -151,24 +155,28 @@ class Serial_COM:
         for baud in self.Serial_config["Baud_Rate"]: self.Baud_Rate_Box1.append_text(str(baud))
         self.Baud_Rate_Box1.set_active(next((index for index, row in enumerate(self.Baud_Rate_Box1.get_model()) if row[0] == str(115200)), -1))
 
-    def remove_ansi_color(string: str) -> str:
+    def remove_ansi_color(self, string: str) -> str:
         ansi_escape = re.compile(r"\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
         return ansi_escape.sub("", string)
 
     def run(self):
         self.window.show_all()
 
+        self.Serial = serial.Serial()
+        self.thread = threading.Thread(target=self.Serial_Receive_event)   
         self.check_thread = threading.Thread(target=self.serial_check)
+
         self.check_thread.start()
         Gtk.main()
 
     def onDestroy(self, *args):
         self.update = False
-        if self.check_thread.is_alive(): self.check_thread.join()
+
+        if self.thread.is_alive(): self.check_thread.join()
         if self.Serial.is_open: self.Serial.close()
         if self.thread.is_alive(): self.thread.join()
-        Gtk.main_quit()   
 
+        Gtk.main_quit()    
    
     def serial_connection(self, widget):
         self.update = False
@@ -190,10 +198,9 @@ class Serial_COM:
 
         if self.Log_Record.get_active(): self.setup_logging(self.Module.get_active_text(), self.Log_Dir.get_current_folder())
 
-        self.thread = threading.Thread(target=self.Serial_Receive_event)   
+        self.thread = threading.Thread(target=self.Serial_Receive_event) 
         self.thread.start()
 
-        
 
     def serial_disconnect(self, widget):
         self.button_connect.set_sensitive(True)
@@ -208,7 +215,7 @@ class Serial_COM:
         
         self.thread.join()
         self.Serial.close()
-
+        
         self.check_thread = threading.Thread(target=self.serial_check)
         self.check_thread.start()        
 
@@ -230,7 +237,7 @@ class Serial_COM:
         self.update = True
         while self.update:
             self.PORT_update()
-            time.sleep(10)
+            time.sleep(2)
 
     def load_Settings(self):
         for comport in serial.tools.list_ports.comports(): self.Serial_Port_Box.append_text(str(comport.device))
@@ -276,10 +283,8 @@ class Serial_COM:
     def on_Discard_Options_clicked(self, button):
         self.COMSettings.hide()
 
-    def on_Command_key_press(self, widget, event):
-        pass
-        # if event.keyval == Gtk.KEY_Return or event.keyval == Gtk.KEY_KP_Enter: 
-        #    self.send_command()
+    def on_Command_activate(self, widget, event):
+        self.send_command()
 
     def on_Button_Send_clicked(self, button):
         self.send_command()
@@ -296,6 +301,8 @@ class Serial_COM:
         received_text = self.Recieved_Text.get_buffer()
         received_text.insert(received_text.get_end_iter(), text,-1)
         self.Recieved_Text.set_buffer(received_text)
+        adjustment = self.received_scroll.get_vadjustment()
+        adjustment.set_value( adjustment.get_upper() ) if adjustment.get_upper() > adjustment.get_page_size() else adjustment.set_value( adjustment.get_upper() - adjustment.get_page_size() )
         if self.Log_Record.get_active(): self.save_logs(text)
 
     def setup_logging(self,module: str, log_dir: str):
@@ -316,7 +323,7 @@ class Serial_COM:
             format="[%(asctime)s][%(levelname)s] > %(message)s",
         )
 
-    def save_logs(self,line: str):
+    def save_logs(self, line: str):
         """
         Saves logs by removing ANSI color codes from the input line and logs the line with an error level if it contains an error code, otherwise logs with an info level.
         Parameters:
@@ -324,9 +331,12 @@ class Serial_COM:
         Returns:
             None
         """
-        logline = re.compile(r"\x1b(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])").sub("", line)
-
-        logging.error(logline) if ERROR_CODE in line else logging.info(logline)
+        logline = self.remove_ansi_color(line)
+        
+        if ERROR_CODE in line: 
+            logging.error(logline)
+        else: 
+            logging.info(logline)
 
 def main():
     prog = Serial_COM()
