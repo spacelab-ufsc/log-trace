@@ -13,11 +13,11 @@ def remove_ansi_color(string: str) -> str:
     return ansi_escape.sub("", string)
 
 def setup_logging(module: str, log_dir: str):
-    filename = "./" + log_dir + "/" + module + ".log"
+    filename = os.path.join(log_dir, module + ".log")
 
     if not os.path.exists(log_dir):
         os.makedirs(log_dir)
-        print(f"Creating log directory on: ./{log_dir}")
+        print(f"Creating log directory on: {log_dir}")
 
     if not os.path.exists(filename):
         with open(filename, "w") as f:
